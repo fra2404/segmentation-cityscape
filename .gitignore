@@ -1,5 +1,6 @@
 .DS_Store
 /logs_**/
 /data/
+*.pth
 
 **.pth
