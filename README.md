@@ -1,6 +1,6 @@
 # Semantic Segmentation Project
 
-This project implements semantic segmentation using the Cityscapes dataset with PyTorch and the DeepLabV3 model. The goal is to classify each pixel in an image into one of 19 categories for urban scenes.
+This project implements semantic segmentation on Cityscapes with PyTorch. You can now train and run inference from Python scripts (no notebook required), with configurable input resolution (recommended 512x1024 or full 1024x2048).
 
 ## Task Description
 
@@ -12,9 +12,15 @@ This project implements semantic segmentation using the Cityscapes dataset with 
 
 ## Project Structure
 
-- `semantic_segmentation.ipynb`: Jupyter notebook with the complete implementation.
-- `requirements.txt`: Python dependencies.
-- `README.md`: This file with project details.
+- `src/cityscapes_seg/`: Python package
+  - `datasets.py`: Cityscapes loaders (train/val/test)
+  - `transforms.py`: Mappings + transforms (Resize optional; NEAREST for masks)
+  - `model.py`: Model factory (`deeplabv3` or `deeplabv3plus`)
+  - `metrics.py`: Pixel accuracy, confusion matrix, mIoU
+  - `train.py`: CLI training script
+  - `predict_test.py`: CLI test inference saving labelId PNGs
+- `requirements.txt`: Python dependencies
+- `README.md`: This file
 
 ## Step-by-Step Setup and Execution
 
@@ -61,18 +67,47 @@ This project implements semantic segmentation using the Cityscapes dataset with 
       └── test/
   ```
 
-### 3. Run the Notebook
+### 3. Run Training (scripts)
 
-- Open `semantic_segmentation.ipynb` in Jupyter or VS Code.
-- Execute cells step by step:
-  - **Imports**: Load PyTorch, torchvision, etc.
-  - **Dataset Loading**: Loads Cityscapes with preprocessing (resize to 256x256, normalization).
-  - **Model Building**: Loads DeepLabV3 ResNet101 pre-trained on COCO, modifies the classifier for 19 classes.
-  - **Training**: Trains for 5 epochs (adjustable) using Adam optimizer and CrossEntropyLoss.
-  - **Evaluation**: Computes pixel accuracy and mean IoU on validation set.
-  - **Visualization**: Shows original images, true masks, and predicted masks.
+Set module path in your shell session:
 
-### 4. About Pre-trained Weights
+```zsh
+export PYTHONPATH="$PWD/src:$PYTHONPATH"
+```
+
+Quick smoke test at 512x1024 on MPS (macOS):
+
+```zsh
+python -m cityscapes_seg.train \
+  --root data/cityscapes \
+  --epochs 3 \
+  --batch-size 2 \
+  --workers 4 \
+  --drop-last \
+  --image-size 512 1024
+```
+
+Notes:
+- Use `--image-size -1 -1` to keep original 1024x2048. Reduce `--batch-size` to 1 if you hit memory limits.
+- For DeepLabV3+ install first: `pip install segmentation-models-pytorch timm`, then add `--model deeplabv3plus --pretrained`.
+
+### 4. Run Test Inference (labelId PNGs)
+
+Uses the best checkpoint saved during training (default `logs/best_model.pth`):
+
+```zsh
+python -m cityscapes_seg.predict_test \
+  --root data/cityscapes \
+  --weights logs/best_model.pth \
+  --outdir predictions_test \
+  --batch-size 2 \
+  --workers 4 \
+  --image-size 512 1024
+```
+
+Outputs are valid Cityscapes `*_gtFine_labelIds.png` for server submission.
+
+### 5. About Pre-trained Weights
 
 - The model uses `deeplabv3_resnet101(pretrained=True)`, which automatically downloads pre-trained weights from the torchvision model zoo (trained on COCO dataset).
 - This provides a strong starting point, improving performance without training from scratch.
@@ -80,7 +115,7 @@ This project implements semantic segmentation using the Cityscapes dataset with 
 - If offline, set `pretrained=False` to train from random weights (slower convergence).
 - For reproducibility, the weights are deterministic, but training results may vary slightly due to randomness.
 
-### 5. Analysis and Results
+### 6. Analysis and Results
 
 - **Data Analysis**: Cityscapes focuses on urban scenes; images are diverse but may have class imbalance (e.g., more road pixels).
 - **Algorithm Effectiveness**: DeepLabV3 uses atrous convolutions and ASPP for multi-scale features, achieving high IoU on urban segmentation.
@@ -96,6 +131,6 @@ This project implements semantic segmentation using the Cityscapes dataset with 
 
 ## Notes
 
-- Training on CPU is slow; use GPU (MPS on macOS) for faster results.
-- For full training, increase epochs to 50+ and use a larger batch size.
-- This is a baseline implementation; refer to the notebook for code details.
+- Training on CPU is slow; prefer MPS (macOS) or CUDA.
+- For better accuracy, train at 512x1024 or full 1024x2048. Avoid 256x256 as it harms Pixel Accuracy and mIoU.
+- Increase epochs (e.g., 50+) for stronger results; tune batch size to fit memory.

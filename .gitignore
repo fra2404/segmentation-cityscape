@@ -4,3 +4,5 @@
 *.pth
 
 **.pth
+
+/predictions_test/
