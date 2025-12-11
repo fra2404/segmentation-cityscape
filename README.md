@@ -88,6 +88,7 @@ python -m cityscapes_seg.train \
 ```
 
 Notes:
+
 - Use `--image-size -1 -1` to keep original 1024x2048. Reduce `--batch-size` to 1 if you hit memory limits.
 - For DeepLabV3+ install first: `pip install segmentation-models-pytorch timm`, then add `--model deeplabv3plus --pretrained`.
 
