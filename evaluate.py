@@ -56,7 +56,7 @@ def main():
     
     # Create dataloaders
     print("\nCreating dataloaders...")
-    _, val_loader, _, _ = create_dataloaders(
+    _, val_loader, _, _, _ = create_dataloaders(
         root=args.data_root,
         batch_size=args.batch_size,
         image_size=tuple(args.image_size),

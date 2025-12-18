@@ -13,7 +13,7 @@ class Config:
     image_size: Tuple[int, int] = (512, 1024)
     batch_size: int = 2
     num_workers: int = 0
-    filter_city: Optional[str] = 'zurich'  # Use single city for faster training
+    filter_city: Optional[str] = None  # Optional city filter for validation
     
     # Training settings
     num_epochs: int = 3
@@ -23,8 +23,13 @@ class Config:
     max_train_batches: Optional[int] = None  # Limit training batches for quick testing
     
     # Weighted sampling
-    use_weighted_sampler: bool = False  # Disabled by default for faster training
+    use_weighted_sampler: bool = True  # Enabled by default to balance rare classes
     max_samples_for_stats: Optional[int] = None  # None = use all samples
+    
+    # Loss and scheduler settings
+    use_class_weights: bool = True  # Use class weighting in loss
+    scheduler: str = 'poly'  # 'poly' or 'cosine'
+    min_lr: float = 1e-6  # Minimum LR for cosine scheduler
     
     # Model settings
     num_classes: int = 19
@@ -62,6 +67,9 @@ class Config:
             'max_train_batches': self.max_train_batches,
             'use_weighted_sampler': self.use_weighted_sampler,
             'max_samples_for_stats': self.max_samples_for_stats,
+            'use_class_weights': self.use_class_weights,
+            'scheduler': self.scheduler,
+            'min_lr': self.min_lr,
             'num_classes': self.num_classes,
             'pretrained': self.pretrained,
             'architecture': self.architecture,

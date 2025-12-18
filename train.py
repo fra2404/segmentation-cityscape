@@ -55,9 +55,20 @@ def parse_args():
     parser.add_argument('--max-train-batches', type=int, default=None,
                         help='Max training batches per epoch (for quick testing)')
     
+    # Loss and scheduler arguments
+    parser.add_argument('--no-class-weights', action='store_true', default=False,
+                        help='Disable class weighting in loss function')
+    parser.add_argument('--scheduler', type=str, default='poly',
+                        choices=['poly', 'cosine'],
+                        help='Learning rate scheduler (poly or cosine)')
+    parser.add_argument('--min-lr', type=float, default=1e-6,
+                        help='Minimum learning rate for cosine scheduler')
+    
     # Model arguments
     parser.add_argument('--num-classes', type=int, default=19,
-                        help='Number of output classes')
+                        help='Number of output classes (19 or 34)')
+    parser.add_argument('--use-all-classes', action='store_true', default=False,
+                        help='Use all 34 Cityscapes classes instead of 19 trainId classes')
     parser.add_argument('--no-pretrained', action='store_false', dest='pretrained',
                         help='Do not use pretrained weights')
     parser.add_argument('--architecture', type=str, default='deeplabv3plus',
@@ -73,7 +84,9 @@ def parse_args():
     parser.add_argument('--checkpoint-dir', type=str, default='./checkpoints',
                         help='Directory to save checkpoints')
     parser.add_argument('--load-checkpoint', type=str, default=None,
-                        help='Path to checkpoint to load')
+                        help='Path to checkpoint to load (full state)')
+    parser.add_argument('--load-weights-only', type=str, default=None,
+                        help='Path to load model weights only (no optimizer state)')
     
     # Action arguments
     parser.add_argument('--mode', type=str, default='train',
@@ -86,6 +99,14 @@ def parse_args():
 def main():
     """Main function."""
     args = parse_args()
+    
+    # Auto-set num_classes if using all classes (BEFORE creating config)
+    if args.use_all_classes:
+        args.num_classes = 34
+        print("📊 Using ALL 34 Cityscapes classes (labelIds)")
+    else:
+        args.num_classes = 19
+        print("📊 Using standard 19 trainId classes")
     
     # Create config from arguments
     config = Config(
@@ -107,6 +128,9 @@ def main():
         device=args.device,
         checkpoint_dir=args.checkpoint_dir,
         load_checkpoint=args.load_checkpoint,
+        use_class_weights=not args.no_class_weights,
+        scheduler=args.scheduler,
+        min_lr=args.min_lr,
     )
     
     # Print configuration
@@ -114,14 +138,15 @@ def main():
     
     # Create dataloaders
     print("Creating dataloaders...")
-    train_loader, val_loader, train_dataset, val_dataset = create_dataloaders(
+    train_loader, val_loader, train_dataset, val_dataset, dataset_stats = create_dataloaders(
         root=config.data_root,
         batch_size=config.batch_size,
         image_size=config.image_size,
         num_workers=config.num_workers,
         use_weighted_sampler=config.use_weighted_sampler,
         max_samples_for_stats=config.max_samples_for_stats,
-        filter_city=config.filter_city
+        filter_city=config.filter_city,
+        use_all_classes=args.use_all_classes
     )
     
     # Create model
@@ -130,12 +155,11 @@ def main():
         num_classes=config.num_classes,
         pretrained=config.pretrained,
         device=config.device,
-        architecture=config.architecture
+        architecture=config.architecture,
+        load_weights_path=args.load_weights_only
     )
     
-    # Load checkpoint if specified
-    if config.load_checkpoint:
-        model = load_checkpoint(model, config.load_checkpoint, device)
+    # Checkpoint loading is now handled by the trainer during train()
     
     # Execute requested mode
     if args.mode == 'train':
@@ -152,10 +176,16 @@ def main():
             learning_rate=config.learning_rate,
             weight_decay=config.weight_decay,
             gradient_accumulation_steps=config.gradient_accumulation_steps,
-            checkpoint_dir=config.checkpoint_dir
+            checkpoint_dir=config.checkpoint_dir,
+            dataset_stats=dataset_stats,
+            num_classes=config.num_classes,
+            image_size=config.image_size,
+            use_class_weights=config.use_class_weights,
+            scheduler_type=config.scheduler,
+            min_lr=config.min_lr
         )
         
-        history = trainer.train(config.num_epochs, max_train_batches=config.max_train_batches)
+        history = trainer.train(config.num_epochs, max_train_batches=config.max_train_batches, resume_from=config.load_checkpoint, current_image_size=config.image_size)
         
         # Plot training history
         plot_training_history(history, save_path='training_history.png')

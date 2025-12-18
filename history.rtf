@@ -1,0 +1,395 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;\f1\fnil\fcharset0 Menlo-Bold;}
+{\colortbl;\red255\green255\blue255;\red57\green192\blue38;\red0\green0\blue0;\red28\green212\blue4;
+\red61\green61\blue61;\red13\green110\blue255;\red255\green255\blue11;\red234\green234\blue234;\red252\green71\blue8;
+}
+{\*\expandedcolortbl;;\cssrgb\c25706\c77963\c19557;\csgray\c0;\cspthree\c38209\c83059\c24573;
+\cspthree\c30588\c30588\c30588;\cspthree\c22946\c52123\c96770;\cspthree\c99999\c100000\c33084;\cspthree\c93333\c93333\c93333;\cspthree\c92741\c41531\c17319;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf2 \CocoaLigature0 python\cf3  \ul train.py\ulnone  --num-epochs 5 --image-size 512 512 --batch-size 1 --grad-accum-steps 8 --learning-rate 1e-4\
+\uc0\u55357 \u56522  Using standard 19 trainId classes\
+\
+============================================================\
+CONFIGURATION\
+============================================================\
+data_root                     : ./data/cityscapes\
+image_size                    : (512, 512)\
+batch_size                    : 1\
+num_workers                   : 0\
+filter_city                   : None\
+num_epochs                    : 5\
+learning_rate                 : 0.0001\
+weight_decay                  : 1e-05\
+gradient_accumulation_steps   : 8\
+max_train_batches             : None\
+use_weighted_sampler          : True\
+max_samples_for_stats         : None\
+num_classes                   : 19\
+pretrained                    : True\
+architecture                  : deeplabv3plus\
+device                        : mps\
+checkpoint_dir                : ./checkpoints\
+load_checkpoint               : None\
+============================================================\
+\
+Creating dataloaders...\
+Loading Cityscapes dataset from ./data/cityscapes...\
+Training samples: 2975\
+Validation samples: 500\
+                                                                                \
+=== DATASET STATS SUMMARY ===\
+Class 0: images=2934, pixels=254749784\
+Class 1: images=2811, pixels=42116030\
+Class 2: images=2934, pixels=157960365\
+Class 3: images=969, pixels=4537098\
+Class 4: images=1296, pixels=6072841\
+Class 5: images=2947, pixels=8487504\
+Class 6: images=1658, pixels=1436129\
+Class 7: images=2808, pixels=3810757\
+Class 8: images=2891, pixels=110189445\
+Class 9: images=1653, pixels=8013716\
+Class 10: images=2686, pixels=27824576\
+Class 11: images=2343, pixels=8424819\
+Class 12: images=1023, pixels=933793\
+Class 13: images=2832, pixels=48395024\
+Class 14: images=359, pixels=1849461\
+Class 15: images=274, pixels=1625340\
+Class 16: images=142, pixels=1610857\
+Class 17: images=513, pixels=682651\
+Class 18: images=1645, pixels=2863135\
+\uc0\u9989  Weighted sampler configured to favor rarer classes                           \
+Training batches: 2975\
+Validation batches: 500\
+\
+Creating model...\
+Creating DEEPLABV3PLUS model with ResNet50 backbone...\
+Number of classes: 19\
+Pretrained: True\
+Model created and moved to mps\
+Total parameters: 40,351,667\
+Trainable parameters: 40,351,667\
+\
+============================================================\
+TRAINING MODE\
+============================================================\
+\uc0\u9989  Using precomputed dataset stats for class weights\
+\uc0\u9989  Using class weighting for loss (rare classes upweighted)\
+Class weights: [0.278, 0.291, 0.278, 0.843, 0.63, 0.277, 0.493, 0.291, 0.283, 0.494, 0.304, 0.349, 0.799, 0.289, 2.276, 2.982, 5.754, 1.593, 0.497]\
+\uc0\u9888 \u65039   AMP disabled for MPS device (stability)\
+Trainer initialized:\
+  Device: mps (interpreted as mps)\
+  Learning rate: 0.0001\
+  Weight decay: 1e-05\
+  Grad accumulation: 8\
+  Checkpoint dir: ./checkpoints\
+  AMP enabled: False (scaler present: False)\
+  Clip grad norm: 1.0\
+  Warmup epochs: 0\
+  Early stopping patience: None\
+\
+Starting training for 5 epochs\
+============================================================\
+\
+Epoch 1/5\
+------------------------------------------------------------\
+Learning Rate: 0.00010000\
+Training Loss: 0.2208 (time: 2780.3s)                                           \
+Validation Loss: 1.4117                                                         \
+Pixel Accuracy: 0.7542\
+Mean IoU: 0.1439\
+\uc0\u9989  New best model saved (mIoU: 0.1439)\
+\
+Epoch 2/5\
+------------------------------------------------------------\
+Learning Rate: 0.00008181\
+Training Loss: 0.1917 (time: 1183.5s)                                           \
+Validation Loss: 1.3292                                                         \
+Pixel Accuracy: 0.7550\
+Mean IoU: 0.1443\
+\uc0\u9989  New best model saved (mIoU: 0.1443)\
+\
+Epoch 3/5\
+------------------------------------------------------------\
+Learning Rate: 0.00006314\
+Training Loss: 0.1795 (time: 1305.8s)                                           \
+Validation Loss: 1.2537                                                         \
+Pixel Accuracy: 0.7693\
+Mean IoU: 0.1690\
+\uc0\u9989  New best model saved (mIoU: 0.1690)\
+\
+Epoch 4/5\
+------------------------------------------------------------\
+Learning Rate: 0.00004384\
+Training Loss: 0.1704 (time: 1586.1s)                                           \
+Validation Loss: 1.1823                                                         \
+Pixel Accuracy: 0.7887\
+Mean IoU: 0.1809\
+\uc0\u9989  New best model saved (mIoU: 0.1809)\
+\
+Epoch 5/5\
+------------------------------------------------------------\
+Learning Rate: 0.00002349\
+Training Loss: 0.1616 (time: 1624.5s)                                           \
+Validation Loss: 1.1227                                                         \
+Pixel Accuracy: 0.8005\
+Mean IoU: 0.1951\
+\uc0\u9989  New best model saved (mIoU: 0.1951)\
+\
+============================================================\
+Training completed!\
+Best mIoU: 0.1951\
+============================================================\
+\uc0\u9989  Training history plot saved to training_history.png\
+\
+Final evaluation on validation set:\
+                                                                                \
+============================================================\
+EVALUATION RESULTS\
+============================================================\
+Pixel Accuracy: 0.8005\
+Mean IoU: 0.1951\
+\
+Class-wise IoU:\
+  road                : 0.8554\
+  sidewalk            : 0.2862\
+  building            : 0.5824\
+  wall                : 0.0444\
+  fence               : 0.0504\
+  pole                : 0.0000\
+  traffic light       : 0.0000\
+  traffic sign        : 0.0000\
+  vegetation          : 0.5338\
+  terrain             : 0.0794\
+  sky                 : 0.3740\
+  person              : 0.0773\
+  rider               : 0.0007\
+  car                 : 0.4175\
+  truck               : 0.0760\
+  bus                 : 0.1449\
+  train               : 0.0933\
+  motorcycle          : 0.0224\
+  bicycle             : 0.0683\
+============================================================\
+\
+\uc0\u9989  Done!\
+(ai) \uc0\u9581 \u9472 \cf4 francesco \cf5 at \cf6 MacBook-Pro-di-Francesco \cf5 in 
+\f1\b \cf7 ~/Locale/Sviluppo/artificial_intelligence_final_project
+\f0\b0 \cf3  \cf5 on\cf3  \cf8 correction/v3+\cf9 \uc0\u10008 \u10008 \u10008 \cf3 \
+\uc0\u9584 \u9472 \'b1 \cf2 python\cf3  \ul train.py\ulnone  --num-epochs 15 --image-size 512 512 --batch-size 1 --grad-accum-steps 8 --learning-rate 1e-4 --load-checkpoint \ul checkpoints/best_model.pth\ulnone  \
+\uc0\u55357 \u56522  Using standard 19 trainId classes\
+\
+============================================================\
+CONFIGURATION\
+============================================================\
+data_root                     : ./data/cityscapes\
+image_size                    : (512, 512)\
+batch_size                    : 1\
+num_workers                   : 0\
+filter_city                   : None\
+num_epochs                    : 15\
+learning_rate                 : 0.0001\
+weight_decay                  : 1e-05\
+gradient_accumulation_steps   : 8\
+max_train_batches             : None\
+use_weighted_sampler          : True\
+max_samples_for_stats         : None\
+num_classes                   : 19\
+pretrained                    : True\
+architecture                  : deeplabv3plus\
+device                        : mps\
+checkpoint_dir                : ./checkpoints\
+load_checkpoint               : checkpoints/best_model.pth\
+============================================================\
+\
+Creating dataloaders...\
+Loading Cityscapes dataset from ./data/cityscapes...\
+Training samples: 2975\
+Validation samples: 500\
+                                                                                \
+=== DATASET STATS SUMMARY ===\
+Class 0: images=2934, pixels=254749784\
+Class 1: images=2811, pixels=42116030\
+Class 2: images=2934, pixels=157960365\
+Class 3: images=969, pixels=4537098\
+Class 4: images=1296, pixels=6072841\
+Class 5: images=2947, pixels=8487504\
+Class 6: images=1658, pixels=1436129\
+Class 7: images=2808, pixels=3810757\
+Class 8: images=2891, pixels=110189445\
+Class 9: images=1653, pixels=8013716\
+Class 10: images=2686, pixels=27824576\
+Class 11: images=2343, pixels=8424819\
+Class 12: images=1023, pixels=933793\
+Class 13: images=2832, pixels=48395024\
+Class 14: images=359, pixels=1849461\
+Class 15: images=274, pixels=1625340\
+Class 16: images=142, pixels=1610857\
+Class 17: images=513, pixels=682651\
+Class 18: images=1645, pixels=2863135\
+\uc0\u9989  Weighted sampler configured to favor rarer classes                           \
+Training batches: 2975\
+Validation batches: 500\
+\
+Creating model...\
+Creating DEEPLABV3PLUS model with ResNet50 backbone...\
+Number of classes: 19\
+Pretrained: True\
+Model created and moved to mps\
+Total parameters: 40,351,667\
+Trainable parameters: 40,351,667\
+\
+============================================================\
+TRAINING MODE\
+============================================================\
+\uc0\u9989  Using precomputed dataset stats for class weights\
+\uc0\u9989  Using class weighting for loss (rare classes upweighted)\
+Class weights: [0.278, 0.291, 0.278, 0.843, 0.63, 0.277, 0.493, 0.291, 0.283, 0.494, 0.304, 0.349, 0.799, 0.289, 2.276, 2.982, 5.754, 1.593, 0.497]\
+\uc0\u9888 \u65039   AMP disabled for MPS device (stability)\
+Trainer initialized:\
+  Device: mps (interpreted as mps)\
+  Learning rate: 0.0001\
+  Weight decay: 1e-05\
+  Grad accumulation: 8\
+  Checkpoint dir: ./checkpoints\
+  AMP enabled: False (scaler present: False)\
+  Clip grad norm: 1.0\
+  Warmup epochs: 0\
+  Early stopping patience: None\
+\
+Starting training for 15 epochs\
+============================================================\
+\uc0\u9989  Loaded checkpoint 'checkpoints/best_model.pth', resuming from epoch 6\
+\
+Epoch 6/15\
+------------------------------------------------------------\
+Learning Rate: 0.00006943\
+Training Loss: 0.1635 (time: 1278.5s)                                           \
+Validation Loss: 1.2047                                                         \
+Pixel Accuracy: 0.7725\
+Mean IoU: 0.1781\
+\uc0\u9989  New best model saved (mIoU: 0.1781)\
+\
+Epoch 7/15\
+------------------------------------------------------------\
+Learning Rate: 0.00006314\
+Training Loss: 0.1571 (time: 1244.1s)                                           \
+Validation Loss: 1.0841                                                               \
+Pixel Accuracy: 0.8038\
+Mean IoU: 0.2003\
+\uc0\u9989  New best model saved (mIoU: 0.2003)\
+\
+Epoch 8/15\
+------------------------------------------------------------\
+Learning Rate: 0.00005679\
+Training Loss: 0.1512 (time: 1226.7s)                                                 \
+Validation Loss: 1.0685                                                               \
+Pixel Accuracy: 0.8139\
+Mean IoU: 0.2076\
+\uc0\u9989  New best model saved (mIoU: 0.2076)\
+\
+Epoch 9/15\
+------------------------------------------------------------\
+Learning Rate: 0.00005036\
+Training Loss: 0.1457 (time: 1240.6s)                                                 \
+Validation Loss: 1.0552                                                               \
+Pixel Accuracy: 0.8132\
+Mean IoU: 0.2148\
+\uc0\u9989  New best model saved (mIoU: 0.2148)\
+\
+Epoch 10/15\
+------------------------------------------------------------\
+Learning Rate: 0.00004384\
+Training Loss: 0.1399 (time: 1202.9s)                                                 \
+Validation Loss: 0.9974                                                               \
+Pixel Accuracy: 0.8180\
+Mean IoU: 0.2151\
+\uc0\u9989  New best model saved (mIoU: 0.2151)\
+\
+Epoch 11/15\
+------------------------------------------------------------\
+Learning Rate: 0.00003720\
+Training Loss: 0.1360 (time: 1201.6s)                                                 \
+Validation Loss: 1.0161                                                               \
+Pixel Accuracy: 0.8288\
+Mean IoU: 0.2293\
+\uc0\u9989  New best model saved (mIoU: 0.2293)\
+\
+Epoch 12/15\
+------------------------------------------------------------\
+Learning Rate: 0.00003043\
+Training Loss: 0.1317 (time: 1197.9s)                                                 \
+Validation Loss: 0.9813                                                               \
+Pixel Accuracy: 0.8310\
+Mean IoU: 0.2292\
+\
+Epoch 13/15\
+------------------------------------------------------------\
+Learning Rate: 0.00002349\
+Training Loss: 0.1276 (time: 1215.3s)                                                 \
+Validation Loss: 0.9745                                                               \
+Pixel Accuracy: 0.8333\
+Mean IoU: 0.2356\
+\uc0\u9989  New best model saved (mIoU: 0.2356)\
+\
+Epoch 14/15\
+------------------------------------------------------------\
+Learning Rate: 0.00001631\
+Training Loss: 0.1243 (time: 1239.6s)                                                 \
+Validation Loss: 0.9811                                                               \
+Pixel Accuracy: 0.8333\
+Mean IoU: 0.2378\
+\uc0\u9989  New best model saved (mIoU: 0.2378)\
+\
+Epoch 15/15\
+------------------------------------------------------------\
+Learning Rate: 0.00000874\
+Training Loss: 0.1241 (time: 1179.0s)                                                 \
+Validation Loss: 0.9477                                                               \
+Pixel Accuracy: 0.8330\
+Mean IoU: 0.2371\
+\
+============================================================\
+Training completed!\
+Best mIoU: 0.2378\
+============================================================\
+\uc0\u9989  Training history plot saved to training_history.png\
+\
+Final evaluation on validation set:\
+                                                                                      \
+============================================================\
+EVALUATION RESULTS\
+============================================================\
+Pixel Accuracy: 0.8330\
+Mean IoU: 0.2371\
+\
+Class-wise IoU:\
+  road                : 0.8827\
+  sidewalk            : 0.3920\
+  building            : 0.6296\
+  wall                : 0.0640\
+  fence               : 0.1030\
+  pole                : 0.0000\
+  traffic light       : 0.0016\
+  traffic sign        : 0.0016\
+  vegetation          : 0.5699\
+  terrain             : 0.1330\
+  sky                 : 0.4451\
+  person              : 0.0915\
+  rider               : 0.0274\
+  car                 : 0.4916\
+  truck               : 0.1053\
+  bus                 : 0.2117\
+  train               : 0.1802\
+  motorcycle          : 0.0366\
+  bicycle             : 0.1383\
+============================================================\
+\
+\uc0\u9989  Done!\
+(ai) \uc0\u9581 \u9472 \cf4 francesco \cf5 at \cf6 MacBook-Pro-di-Francesco \cf5 in 
+\f1\b \cf7 ~/Locale/Sviluppo/artificial_intelligence_final_project
+\f0\b0 \cf3  \cf5 on\cf3  \cf8 correction/v3+\cf9 \uc0\u10008 \u10008 \u10008 \cf3 \
+\uc0\u9584 \u9472 \'b1 \
+}

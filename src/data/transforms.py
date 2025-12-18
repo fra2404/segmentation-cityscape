@@ -4,17 +4,32 @@ import torch
 from torchvision import transforms
 
 
-def to_train_id(mask_tensor):
+def to_train_id(mask_tensor, use_all_classes=False):
     """
-    Map Cityscapes labelIds (0..33) to trainIds (0..18) with 255 as ignore.
+    Map Cityscapes labelIds to trainIds or map all labelIds to consecutive 0-33.
     
     Args:
         mask_tensor: Tensor with shape (1, H, W) containing labelIds
+        use_all_classes: If True, map all 34 labelIds to consecutive 0-33; if False, map to 19 trainIds
         
     Returns:
-        Tensor with shape (H, W) containing trainIds
+        Tensor with shape (H, W) containing consecutive class indices
     """
     mask_tensor = mask_tensor.squeeze(0).long()  # (H, W)
+    mapping = torch.full((256,), 255, dtype=torch.long)  # default ignore
+    
+    if use_all_classes:
+        # Map all 34 Cityscapes labelIds to consecutive indices 0-33
+        # Cityscapes labelIds: 0-33 but non-consecutive (e.g., missing 14, 15, 16, 29, 30)
+        cityscapes_labels = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 
+                            17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 
+                            31, 32, 33, -1, -1, -1, -1, -1]  # 34 classes total (some are void/unused)
+        for consecutive_idx, label_id in enumerate(cityscapes_labels):
+            if label_id >= 0:
+                mapping[label_id] = consecutive_idx
+        return mapping[mask_tensor]
+    
+    # Standard 19-class mapping
     mapping = torch.full((256,), 255, dtype=torch.long)  # default ignore
     
     # Official Cityscapes mapping (labelId -> trainId)
@@ -78,7 +93,7 @@ def trainid_to_labelid(trainid_tensor):
     return mapping[trainid_tensor]
 
 
-def get_train_transforms(image_size=(512, 1024)):
+def get_train_transforms(image_size=(256, 256)):
     """
     Get training transforms with data augmentation.
     
@@ -99,7 +114,7 @@ def get_train_transforms(image_size=(512, 1024)):
     ])
 
 
-def get_val_transforms(image_size=(512, 1024)):
+def get_val_transforms(image_size=(256, 256)):
     """
     Get validation transforms (no augmentation).
     
@@ -116,12 +131,13 @@ def get_val_transforms(image_size=(512, 1024)):
     ])
 
 
-def get_target_transform(image_size=(512, 1024)):
+def get_target_transform(image_size=(256, 256), use_all_classes=False):
     """
     Get target (mask) transforms.
     
     Args:
         image_size: Tuple of (height, width)
+        use_all_classes: If True, use all 34 Cityscapes classes; if False, use 19 trainId classes
         
     Returns:
         Composed transforms for segmentation masks
@@ -129,5 +145,5 @@ def get_target_transform(image_size=(512, 1024)):
     return transforms.Compose([
         transforms.Resize(image_size, interpolation=transforms.InterpolationMode.NEAREST),
         transforms.PILToTensor(),
-        transforms.Lambda(to_train_id)
+        transforms.Lambda(lambda x: to_train_id(x, use_all_classes=use_all_classes))
     ])

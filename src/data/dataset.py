@@ -71,7 +71,7 @@ def compute_dataset_stats(dataset, num_classes=19, max_samples=None):
     images_with_class = torch.zeros(num_classes, dtype=torch.long)
     total_images = len(dataset) if max_samples is None else min(len(dataset), max_samples)
     
-    for idx in tqdm(range(total_images), desc="Computing dataset stats"):
+    for idx in tqdm(range(total_images), desc="Computing dataset stats", position=0, leave=False):
         _, mask = dataset[idx]
         mask_cpu = mask.cpu()
         for cls in range(num_classes):
@@ -94,11 +94,12 @@ def create_weighted_sampler(dataset, num_classes=19, max_samples=None):
         max_samples: Maximum number of samples for stats (None = all)
         
     Returns:
-        WeightedRandomSampler instance
+        tuple: (WeightedRandomSampler, dataset_stats) - stats to reuse in trainer
     """
     class_pixel_counts, images_with_class, total_images = compute_dataset_stats(
         dataset, num_classes, max_samples
     )
+    dataset_stats = (class_pixel_counts, images_with_class, total_images)
     
     print("\n=== DATASET STATS SUMMARY ===")
     for cls in range(num_classes):
@@ -110,7 +111,7 @@ def create_weighted_sampler(dataset, num_classes=19, max_samples=None):
     
     # Assign weight to each sample based on classes present
     sample_weights = torch.zeros(len(dataset), dtype=torch.float)
-    for idx in tqdm(range(len(dataset)), desc="Building sample weights"):
+    for idx in tqdm(range(len(dataset)), desc="Building sample weights", position=0, leave=False):
         _, mask = dataset[idx]
         classes_present = torch.unique(mask)
         classes_present = classes_present[(classes_present >= 0) & (classes_present < num_classes)]
@@ -127,7 +128,7 @@ def create_weighted_sampler(dataset, num_classes=19, max_samples=None):
     )
     print("✅ Weighted sampler configured to favor rarer classes")
     
-    return sampler
+    return sampler, dataset_stats
 
 
 def create_dataloaders(
@@ -137,7 +138,8 @@ def create_dataloaders(
     num_workers=0,
     use_weighted_sampler=True,
     max_samples_for_stats=None,
-    filter_city=None
+    filter_city=None,
+    use_all_classes=False
 ):
     """
     Create train and validation dataloaders for Cityscapes.
@@ -150,14 +152,15 @@ def create_dataloaders(
         use_weighted_sampler: Whether to use weighted sampling for training
         max_samples_for_stats: Max samples for computing stats (None = all)
         filter_city: Filter validation set to specific city (e.g., 'frankfurt')
+        use_all_classes: If True, use all 34 Cityscapes classes; if False, use 19 trainId classes
         
     Returns:
-        Tuple of (train_loader, val_loader, train_dataset, val_dataset)
+        Tuple of (train_loader, val_loader, train_dataset, val_dataset, dataset_stats)
     """
     # Get transforms
     train_transform = get_train_transforms(image_size)
     val_transform = get_val_transforms(image_size)
-    target_transform = get_target_transform(image_size)
+    target_transform = get_target_transform(image_size, use_all_classes=use_all_classes)
     
     print(f"Loading Cityscapes dataset from {root}...")
     
@@ -197,8 +200,12 @@ def create_dataloaders(
     # Create weighted sampler for training if requested
     sampler = None
     shuffle = True
+    dataset_stats = None
     if use_weighted_sampler:
-        sampler = create_weighted_sampler(train_dataset, max_samples=max_samples_for_stats)
+        num_classes = 34 if use_all_classes else 19
+        sampler, dataset_stats = create_weighted_sampler(
+            train_dataset, num_classes=num_classes, max_samples=max_samples_for_stats
+        )
         shuffle = False  # Sampler and shuffle are mutually exclusive
     
     # Create dataloaders
@@ -224,4 +231,4 @@ def create_dataloaders(
     print(f"Training batches: {len(train_loader)}")
     print(f"Validation batches: {len(val_loader)}")
     
-    return train_loader, val_loader, train_dataset, val_dataset
+    return train_loader, val_loader, train_dataset, val_dataset, dataset_stats

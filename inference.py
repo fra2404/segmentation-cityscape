@@ -11,7 +11,7 @@ from src.data.transforms import get_val_transforms
 from src.utils.visualization import get_cityscapes_colormap, denormalize_image
 
 
-def inference_single_image(model, image_path, device, save_path=None):
+def inference_single_image(model, image_path, device, image_size=(512, 1024), save_path=None):
     """
     Run inference on a single image.
     
@@ -25,7 +25,7 @@ def inference_single_image(model, image_path, device, save_path=None):
     image = Image.open(image_path).convert('RGB')
     original_size = image.size  # (width, height)
     
-    transform = get_val_transforms()
+    transform = get_val_transforms(image_size)
     input_tensor = transform(image).unsqueeze(0).to(device)
     
     # Run inference
@@ -85,6 +85,8 @@ def main():
                         help='Path to model checkpoint')
     parser.add_argument('--output', type=str, default=None,
                         help='Path to save output visualization')
+    parser.add_argument('--image-size', type=int, nargs=2, default=[512, 1024],
+                        help='Resize (height width) before inference to match training resolution')
     parser.add_argument('--device', type=str, default='mps',
                         choices=['mps', 'cuda', 'cpu'],
                         help='Device to use')
@@ -114,6 +116,7 @@ def main():
         model,
         args.image,
         device,
+        image_size=tuple(args.image_size),
         save_path=args.output
     )
     

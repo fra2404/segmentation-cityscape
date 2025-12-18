@@ -66,7 +66,7 @@ def evaluate_model(model, val_loader, device, num_classes=19):
     total_ious = []
     
     with torch.no_grad():
-        for images, masks in tqdm(val_loader, desc="Evaluating"):
+        for images, masks in tqdm(val_loader, desc="Evaluating", position=0, leave=False):
             images = images.to(device)
             masks = masks.to(device)
             

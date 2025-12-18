@@ -104,7 +104,7 @@ def generate_predictions(model, dataloader, output_dir, device, split='val'):
     saved_files = []
     
     with torch.no_grad():
-        for batch_idx, batch in enumerate(tqdm(dataloader, desc='Generating predictions')):
+        for batch_idx, batch in enumerate(tqdm(dataloader, desc='Generating predictions', position=0, leave=False)):
             images = batch['image'].to(device)
             filenames = batch['filename']
             
