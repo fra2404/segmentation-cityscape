@@ -3,6 +3,11 @@
 import torch
 from torchvision import transforms
 
+# Albumentations is used to mirror the notebook augmentation pipeline
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
+import cv2
+
 
 def to_train_id(mask_tensor, use_all_classes=False):
     """
@@ -146,4 +151,39 @@ def get_target_transform(image_size=(256, 256), use_all_classes=False):
         transforms.Resize(image_size, interpolation=transforms.InterpolationMode.NEAREST),
         transforms.PILToTensor(),
         transforms.Lambda(lambda x: to_train_id(x, use_all_classes=use_all_classes))
+    ])
+
+
+# ----------------------------
+# Albumentations (notebook-like)
+# ----------------------------
+
+def get_train_transforms_albu(image_size=(512, 512)):
+    """Albumentations training transforms (replica of the notebook pipeline)."""
+    height, width = image_size
+    # Use integer values for interpolation to avoid Pylint error
+    INTER_LINEAR = 1
+    return A.Compose([
+        A.Resize(height=height, width=width, interpolation=INTER_LINEAR),
+        A.RandomScale(scale_limit=(0.5, 2.0), p=1.0),
+        A.RandomCrop(height=height, width=width),
+        A.HorizontalFlip(p=0.5),
+
+        A.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1, p=0.5),
+        A.RandomBrightnessContrast(p=0.3),
+        A.GaussianBlur(blur_limit=(3, 3), p=0.1),
+
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0),
+        ToTensorV2()
+    ])
+
+
+def get_val_transforms_albu(image_size=(512, 512)):
+    """Albumentations validation transforms (resize + normalize)."""
+    height, width = image_size
+    INTER_NEAREST = 0
+    return A.Compose([
+        A.Resize(height=height, width=width, interpolation=INTER_NEAREST),
+        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0),
+        ToTensorV2()
     ])

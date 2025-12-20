@@ -1,12 +1,21 @@
+from .transforms import to_train_id
 """Cityscapes dataset loading and dataloaders creation."""
 
 import os
+import numpy as np
+from PIL import Image
 import torch
 from torch.utils.data import DataLoader, WeightedRandomSampler, Dataset
 from torchvision import datasets
 from tqdm import tqdm
 
-from .transforms import get_train_transforms, get_val_transforms, get_target_transform
+from .transforms import (
+    get_train_transforms,
+    get_val_transforms,
+    get_target_transform,
+    get_train_transforms_albu,
+    get_val_transforms_albu,
+)
 
 
 class CityscapesDataset(Dataset):
@@ -45,14 +54,93 @@ class CityscapesDataset(Dataset):
             # Extract filename from the image path
             image_path = self.dataset.images[idx]
             filename = os.path.basename(image_path)
-            
+
+            # Ensure image is a tensor
+            if isinstance(image, Image.Image):
+                import torchvision.transforms as T
+                image = T.ToTensor()(image)
+            # Ensure mask is a tensor (if present)
+            if isinstance(mask, Image.Image):
+                mask = torch.from_numpy(np.array(mask)).long()
+
             return {
                 'image': image,
                 'mask': mask,
                 'filename': filename
             }
         else:
+            # Ensure image and mask are tensors
+            if isinstance(image, Image.Image):
+                import torchvision.transforms as T
+                image = T.ToTensor()(image)
+            if isinstance(mask, Image.Image):
+                mask = torch.from_numpy(np.array(mask)).long()
             return image, mask
+
+
+class CityscapesRawDataset(Dataset):
+    """
+    Custom loader that mirrors the notebook approach: reads raw files from
+    leftImg8bit/ and gtFine/ folders and applies Albumentations transforms
+    that handle image+mask jointly.
+    """
+
+    def __init__(self, root, split='train', transforms=None):
+        self.root = root
+        self.split = split
+        self.transforms = transforms
+
+        self.image_dir = os.path.join(root, 'leftImg8bit', split)
+        self.mask_dir = os.path.join(root, 'gtFine', split)
+
+        self.image_list = []
+        for city in os.listdir(self.image_dir):
+            city_dir = os.path.join(self.image_dir, city)
+            for fname in os.listdir(city_dir):
+                if fname.endswith('_leftImg8bit.png'):
+                    self.image_list.append(os.path.join(city, fname))
+
+    def __len__(self):
+        return len(self.image_list)
+
+    def __getitem__(self, idx):
+        rel_path = self.image_list[idx]
+        city, image_name = rel_path.split('/')
+
+        image_path = os.path.join(self.image_dir, city, image_name)
+
+        # Cerca prima labelTrainIds, poi labelIds se non esiste
+        mask_name_trainids = image_name.replace('_leftImg8bit.png', '_gtFine_labelTrainIds.png')
+        mask_name_labelids = image_name.replace('_leftImg8bit.png', '_gtFine_labelIds.png')
+        mask_path_trainids = os.path.join(self.mask_dir, city, mask_name_trainids)
+        mask_path_labelids = os.path.join(self.mask_dir, city, mask_name_labelids)
+
+        if os.path.exists(mask_path_trainids):
+            mask_path = mask_path_trainids
+        elif os.path.exists(mask_path_labelids):
+            mask_path = mask_path_labelids
+        else:
+            raise FileNotFoundError(f"Mask not found for {image_name} in {city}")
+
+
+        image = np.array(Image.open(image_path).convert('RGB'))
+        mask = np.array(Image.open(mask_path), dtype=np.uint8)
+
+        # Se la maschera è labelIds, converti in trainId
+        if 'labelIds' in mask_path:
+            mask = to_train_id(torch.from_numpy(mask).unsqueeze(0)).numpy()
+
+        if self.transforms is not None:
+            augmented = self.transforms(image=image, mask=mask)
+            image = augmented['image']
+            mask = augmented['mask']
+
+        if isinstance(mask, np.ndarray):
+            mask = torch.from_numpy(mask).long()
+        else:
+            mask = mask.long()
+
+        return image, mask
 
 
 def compute_dataset_stats(dataset, num_classes=19, max_samples=None):
@@ -139,7 +227,8 @@ def create_dataloaders(
     use_weighted_sampler=True,
     max_samples_for_stats=None,
     filter_city=None,
-    use_all_classes=False
+    use_all_classes=False,
+    use_albumentations=True,
 ):
     """
     Create train and validation dataloaders for Cityscapes.
@@ -157,31 +246,38 @@ def create_dataloaders(
     Returns:
         Tuple of (train_loader, val_loader, train_dataset, val_dataset, dataset_stats)
     """
-    # Get transforms
-    train_transform = get_train_transforms(image_size)
-    val_transform = get_val_transforms(image_size)
-    target_transform = get_target_transform(image_size, use_all_classes=use_all_classes)
-    
     print(f"Loading Cityscapes dataset from {root}...")
-    
-    # Create datasets
-    train_dataset = datasets.Cityscapes(
-        root=root,
-        split='train',
-        mode='fine',
-        target_type='semantic',
-        transform=train_transform,
-        target_transform=target_transform
-    )
-    
-    val_dataset = datasets.Cityscapes(
-        root=root,
-        split='val',
-        mode='fine',
-        target_type='semantic',
-        transform=val_transform,
-        target_transform=target_transform
-    )
+
+    if use_albumentations:
+        # Notebook-like: Albumentations on raw files (trainId masks already encoded)
+        train_transform = get_train_transforms_albu(image_size)
+        val_transform = get_val_transforms_albu(image_size)
+
+        train_dataset = CityscapesRawDataset(root=root, split='train', transforms=train_transform)
+        val_dataset = CityscapesRawDataset(root=root, split='val', transforms=val_transform)
+    else:
+        # Fallback to torchvision pipeline (kept for compatibility)
+        train_transform = get_train_transforms(image_size)
+        val_transform = get_val_transforms(image_size)
+        target_transform = get_target_transform(image_size, use_all_classes=use_all_classes)
+
+        train_dataset = datasets.Cityscapes(
+            root=root,
+            split='train',
+            mode='fine',
+            target_type='semantic',
+            transform=train_transform,
+            target_transform=target_transform
+        )
+
+        val_dataset = datasets.Cityscapes(
+            root=root,
+            split='val',
+            mode='fine',
+            target_type='semantic',
+            transform=val_transform,
+            target_transform=target_transform
+        )
     
     # Filter validation set by city if requested
     if filter_city:
@@ -197,10 +293,12 @@ def create_dataloaders(
     print(f"Training samples: {len(train_dataset)}")
     print(f"Validation samples: {len(val_dataset)}")
     
-    # Create weighted sampler for training if requested
+    # Create weighted sampler for training if requested (disabled when using Albumentations to mirror notebook)
     sampler = None
     shuffle = True
     dataset_stats = None
+    if use_albumentations:
+        use_weighted_sampler = False
     if use_weighted_sampler:
         num_classes = 34 if use_all_classes else 19
         sampler, dataset_stats = create_weighted_sampler(
@@ -215,7 +313,7 @@ def create_dataloaders(
         sampler=sampler,
         shuffle=shuffle,
         num_workers=num_workers,
-        pin_memory=False,
+        pin_memory=True,
         drop_last=True  # Drop last incomplete batch to avoid batch norm issues
     )
     
@@ -224,7 +322,7 @@ def create_dataloaders(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
-        pin_memory=False,
+        pin_memory=True,
         drop_last=True
     )
     

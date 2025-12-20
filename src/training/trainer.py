@@ -33,11 +33,13 @@ class Trainer:
         train_loader,
         val_loader,
         device: torch.device,
-        learning_rate: float = 1e-4,
-        weight_decay: float = 1e-5,
-        gradient_accumulation_steps: int = 2,
+        learning_rate: float = 3e-4,
+        lr_backbone: float = 2e-5,
+        lr_head: float = 3e-4,
+        weight_decay: float = 1e-4,
+        gradient_accumulation_steps: int = 1,
         checkpoint_dir: str = './checkpoints',
-        use_class_weights: bool = True,
+        use_class_weights: bool = False,
         dataset_stats=None,
         max_samples_for_stats: Optional[int] = None,
         num_classes: int = 19,
@@ -97,12 +99,34 @@ class Trainer:
             print("✅ Using standard CrossEntropyLoss (no class weights)")
             self.criterion = nn.CrossEntropyLoss(ignore_index=255)
 
-        # ----- optimizer -----
-        self.optimizer = torch.optim.AdamW(
-            self.model.parameters(),
-            lr=learning_rate,
-            weight_decay=weight_decay
-        )
+        # ----- optimizer with param groups (backbone vs head) -----
+        def _build_param_groups():
+            backbone_prefixes = ('layer0', 'layer1', 'layer2', 'layer3', 'layer4')
+            backbone_params, head_params = [], []
+
+            for name, param in self.model.named_parameters():
+                if not param.requires_grad:
+                    continue
+                if name.startswith(backbone_prefixes):
+                    backbone_params.append(param)
+                else:
+                    head_params.append(param)
+
+            groups = []
+            if backbone_params:
+                groups.append({'params': backbone_params, 'lr': lr_backbone, 'weight_decay': weight_decay})
+            if head_params:
+                groups.append({'params': head_params, 'lr': lr_head, 'weight_decay': weight_decay})
+
+            # Fallback: single group
+            if not groups:
+                groups.append({'params': self.model.parameters(), 'lr': learning_rate, 'weight_decay': weight_decay})
+            return groups
+
+        param_groups = _build_param_groups()
+
+        # weight_decay handled per-group; set global WD to 0 to avoid double
+        self.optimizer = torch.optim.AdamW(param_groups, lr=learning_rate, weight_decay=0.0)
 
         # ----- device type & AMP scaler -----
         dev_type = 'cuda' if device.type == 'cuda' else ('mps' if device.type == 'mps' else 'cpu')
@@ -134,7 +158,7 @@ class Trainer:
 
         print("Trainer initialized:")
         print(f"  Device: {device} (interpreted as {self._device_type})")
-        print(f"  Learning rate: {learning_rate}")
+        print(f"  LR backbone: {lr_backbone} | LR head: {lr_head}")
         print(f"  Weight decay: {weight_decay}")
         print(f"  Grad accumulation: {gradient_accumulation_steps}")
         print(f"  Checkpoint dir: {checkpoint_dir}")

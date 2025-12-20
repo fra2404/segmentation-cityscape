@@ -11,23 +11,23 @@ class Config:
     # Data settings
     data_root: str = './data/cityscapes'
     image_size: Tuple[int, int] = (512, 1024)
-    batch_size: int = 2
+    batch_size: int = 4
     num_workers: int = 0
     filter_city: Optional[str] = None  # Optional city filter for validation
     
     # Training settings
-    num_epochs: int = 3
-    learning_rate: float = 1e-3
-    weight_decay: float = 1e-5
-    gradient_accumulation_steps: int = 2
+    num_epochs: int = 10
+    learning_rate: float = 3e-4
+    weight_decay: float = 1e-4
+    gradient_accumulation_steps: int = 1
     max_train_batches: Optional[int] = None  # Limit training batches for quick testing
     
     # Weighted sampling
-    use_weighted_sampler: bool = True  # Enabled by default to balance rare classes
+    use_weighted_sampler: bool = False  # Disabled to mirror notebook training
     max_samples_for_stats: Optional[int] = None  # None = use all samples
     
     # Loss and scheduler settings
-    use_class_weights: bool = True  # Use class weighting in loss
+    use_class_weights: bool = False  # Notebook uses unweighted CE loss
     scheduler: str = 'poly'  # 'poly' or 'cosine'
     min_lr: float = 1e-6  # Minimum LR for cosine scheduler
     

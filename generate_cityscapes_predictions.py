@@ -184,21 +184,22 @@ def main():
         device=args.device,
         architecture=args.architecture
     )
-    
+
     # Load checkpoint
     model = load_checkpoint(model, args.checkpoint, device)
-    
+
     # Create dataset
     print(f"\nLoading {args.split} dataset...")
+    import torchvision.transforms as T
     dataset = CityscapesDataset(
         root=args.data_root,
         split=args.split,
         mode='fine',
         target_type='semantic',
-        transform=None,  # No augmentation for inference
+        transform=T.ToTensor(),  # Convert PIL to tensor
         return_filename=True  # Important: return filename for saving
     )
-    
+
     # Create dataloader
     dataloader = DataLoader(
         dataset,

@@ -213,12 +213,12 @@ def load_checkpoint(model, checkpoint_path, device):
         Model with loaded weights
     """
     print(f"Loading checkpoint from {checkpoint_path}...")
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+
     if 'model_state_dict' in checkpoint:
-        model.load_state_dict(checkpoint['model_state_dict'])
+        model.load_state_dict(checkpoint['model_state_dict'], strict=False)
     else:
-        model.load_state_dict(checkpoint)
+        model.load_state_dict(checkpoint, strict=False)
     
     print("✅ Checkpoint loaded successfully")
     return model

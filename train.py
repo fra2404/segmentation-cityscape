@@ -25,7 +25,7 @@ def parse_args():
     # Data arguments
     parser.add_argument('--data-root', type=str, default='./data/cityscapes',
                         help='Path to Cityscapes dataset')
-    parser.add_argument('--batch-size', type=int, default=2,
+    parser.add_argument('--batch-size', type=int, default=4,
                         help='Batch size for training')
     parser.add_argument('--num-workers', type=int, default=0,
                         help='Number of data loading workers')
@@ -35,17 +35,17 @@ def parse_args():
                         help='Filter validation set to specific city (e.g., frankfurt)')
     
     # Training arguments
-    parser.add_argument('--num-epochs', type=int, default=3,
+    parser.add_argument('--num-epochs', type=int, default=10,
                         help='Number of training epochs')
-    parser.add_argument('--learning-rate', type=float, default=1e-3,
+    parser.add_argument('--learning-rate', type=float, default=3e-4,
                         help='Learning rate')
-    parser.add_argument('--weight-decay', type=float, default=1e-5,
+    parser.add_argument('--weight-decay', type=float, default=1e-4,
                         help='Weight decay')
-    parser.add_argument('--grad-accum-steps', type=int, default=2,
+    parser.add_argument('--grad-accum-steps', type=int, default=1,
                         help='Gradient accumulation steps')
     
     # Sampling arguments
-    parser.add_argument('--use-weighted-sampler', action='store_true', default=True,
+    parser.add_argument('--use-weighted-sampler', action='store_true', default=False,
                         help='Use weighted sampling for training')
     parser.add_argument('--no-weighted-sampler', dest='use_weighted_sampler',
                         action='store_false',
@@ -56,7 +56,7 @@ def parse_args():
                         help='Max training batches per epoch (for quick testing)')
     
     # Loss and scheduler arguments
-    parser.add_argument('--no-class-weights', action='store_true', default=False,
+    parser.add_argument('--no-class-weights', action='store_true', default=True,
                         help='Disable class weighting in loss function')
     parser.add_argument('--scheduler', type=str, default='poly',
                         choices=['poly', 'cosine'],

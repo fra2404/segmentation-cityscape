@@ -78,13 +78,30 @@ def visualize_predictions(
     model.eval()
     
     # Get a batch
-    images, masks = next(iter(dataloader))
-    images = images.to(device)
-    masks = masks.to(device)
+    batch = next(iter(dataloader))
+    if isinstance(batch, dict):
+        images = batch['image']
+        # Se per errore è una lista di tensori, stacka
+        if isinstance(images, list):
+            images = torch.stack(images)
+        # Se per errore è una lista di numpy, convertila
+        if isinstance(images, np.ndarray) and images.dtype.type is np.str_:
+            raise ValueError("batch['image'] contiene stringhe, non tensori!")
+        images = images.to(device)
+        masks = batch['mask'].to(device)
+    else:
+        images, masks = batch
+        images = images.to(device)
+        masks = masks.to(device)
     
+    # Debug info
+    print("images type:", type(images))
+    print("images dtype:", images.dtype)
+    print("images device:", images.device)
+    print("images shape:", images.shape)
     # Get predictions
     with torch.no_grad():
-        outputs = model(images)['out']
+        outputs = model(images)
         preds = torch.argmax(outputs, dim=1)
     
     # Move to CPU
