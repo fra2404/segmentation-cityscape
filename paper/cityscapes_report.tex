@@ -40,7 +40,7 @@ Email: francescoalbano@buaa.edu.cn, francescoalbano357@gmail.com
 \begin{document}
 
 \pagestyle{fancy}
-\fancyhead[C]{\textcolor{headergray}{Project report for Artificial Intelligence --- BUAA (Project 2: Semantic Segmentation)}}
+\fancyhead[C]{\textcolor{headergray}{Final Project – Student ID: LJ2506219 – Artificial Intelligence}}
 \renewcommand{\headrulewidth}{0pt}
 \fancyfoot[C]{\thepage}
 \setlength{\footskip}{40pt}
@@ -48,7 +48,7 @@ Email: francescoalbano@buaa.edu.cn, francescoalbano357@gmail.com
 \maketitle
 
 \begin{abstract}
-This report describes the implementation and evaluation of a semantic segmentation pipeline on the Cityscapes dataset using a DeepLabV3+ architecture. The project includes an end-to-end training script configurable from the command line, a robust checkpointing system enabling interruption and exact resumption of training, and utilities to generate predictions compliant with the official Cityscapes submission format. Development and early experiments were conducted on macOS (CPU/MPS) for rapid iteration, while full training was executed on Google Colab using an NVIDIA T4 GPU to significantly reduce training time.
+This report describes the implementation and evaluation of a semantic segmentation pipeline on the Cityscapes dataset using a DeepLabV3+ architecture. The project includes an end-to-end training script configurable from the command line, a robust checkpointing system enabling interruption and exact resumption of training, and utilities to generate predictions compliant with the official Cityscapes submission format. Development and early experiments were conducted on macOS (CPU/MPS) for rapid iteration, while full training was executed on Google Colab using an NVIDIA T4 GPU. This not only significantly reduced training time, but also enabled higher model quality by allowing for larger batch sizes, longer training schedules, and more extensive experimentation compared to CPU/MPS.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -87,7 +87,7 @@ The final output is a dense logit tensor at the original input resolution, enabl
 Two dataset access patterns are available:
 \begin{itemize}
 \item A wrapper around \texttt{torchvision.datasets.Cityscapes} (\texttt{CityscapesDataset}) primarily used for inference/submission generation where filenames are needed.
-\item A custom raw-file loader (\texttt{CityscapesRawDataset}) designed to mirror a notebook-like pipeline and to support Albumentations transforms jointly on image and mask.
+\item A custom raw-file loader (\texttt{CityscapesRawDataset}) designed to apply Albumentations transforms in a coordinated way to both the image and the segmentation mask.
 \end{itemize}
 
 Cityscapes provides multiple label encodings. The training pipeline targets the standard 19-class \textit{trainId} setting, and uses \texttt{ignore\_index=255} for void/unlabeled pixels.
@@ -113,6 +113,7 @@ Class weighting is supported but disabled in the reported training configuration
 
 \subsection{Learning Rate Scheduling: Cosine Annealing}
 The training code supports either a polynomial schedule or cosine annealing. The reported experiment uses cosine annealing with a minimum learning rate $\eta_{min}$. In its standard form, cosine annealing updates the learning rate as:
+The polynomial schedule reduces the learning rate following a power law, typically as $\eta(t) = \eta_{max} (1 - t/T)^{p}$, where $t$ is the current step, $T$ is the total number of steps, and $p$ is the power. This results in a smooth, monotonic decay of the learning rate. Cosine annealing, instead, decreases the learning rate following a cosine curve, periodically allowing for larger learning rates and potentially helping the optimizer escape local minima.
 \begin{equation}
 \eta(t) = \eta_{min} + \frac{1}{2}(\eta_{max}-\eta_{min})\left(1+\cos\left(\pi \frac{t}{T}\right)\right),
 \end{equation}
@@ -137,7 +138,7 @@ python train.py \
 This approach is beneficial because it (i) exposes the main hyperparameters, (ii) enables systematic experimentation by changing a small set of flags, and (iii) adapts seamlessly to different hardware backends (CPU/MPS for development, CUDA for full training).
 
 \subsection{Hardware and Execution Environment}
-Early development and sanity checks were executed on macOS using CPU/MPS to speed up iteration and debugging. Full training was then moved to Google Colab and executed on an NVIDIA T4 GPU, which substantially reduces training time compared to CPU/MPS.
+Early development and sanity checks were executed on macOS using CPU/MPS to speed up iteration and debugging. Full training was then moved to Google Colab and executed on an NVIDIA T4 GPU, which not only substantially reduces training time compared to CPU/MPS, but also enables higher model quality by supporting larger batch sizes, longer training, and more complex experiments that would not be feasible on CPU/MPS.
 
 \subsection{Checkpointing and Robust Resume}
 A full checkpoint is saved after each epoch. Each checkpoint contains:
@@ -175,7 +176,8 @@ This section reports quantitative results based exclusively on the checkpoint an
 
 
 \subsection{Checkpoint Metrics (Epoch 1--25)}
-Table~\ref{tab:checkpoint_summary} summarizes representative checkpoints. For readability, the table is split into two columns.
+Table~\ref{tab:checkpoint_summary} summarizes representative checkpoints.
+All metrics (loss, pixel accuracy, mIoU) are available for every checkpoint and their evolution across epochs is visualized in the summary plots at the end of the report (Figures~\ref{fig:loss_curves} and~\ref{fig:miou_curve}). In the table below, we show a selection of representative checkpoints: epochs 13 and 14 are included to demonstrate the interruption and successful resume from a checkpoint, while epochs 24 and 25 correspond respectively to the best validation mIoU and the final epoch. This selection highlights both the robustness of the checkpointing system and the model's best performance.
 
 \begin{table}[ht]
 \centering
@@ -274,20 +276,20 @@ python inference.py \
   --device cuda \
   --output overlay_example.png
 \end{lstlisting}
-This will save an image with the predicted segmentation overlaid on the original. By repeating this for a few diverse samples (e.g., scenes with traffic, pedestrians, or different lighting), you can qualitatively inspect the model's performance. Example overlays are included in the appendix.
+This will save an image with the predicted segmentation overlaid on the original. Example overlays are included in the appendix.
 
 \section{Conclusion}
 \label{sec:conclusion}
 This project implements an end-to-end semantic segmentation workflow for Cityscapes using DeepLabV3+. The system provides a configurable training interface, robust checkpointing and resumption, and tooling for producing Cityscapes-compliant prediction files for official evaluation. Quantitative results extracted from the checkpoint analysis show consistent improvement across epochs, reaching a best validation mIoU of 0.4574 at epoch 24, with pixel accuracy of 0.9423. The combination of a GPU training environment and a resumable training pipeline supports efficient experimentation while maintaining reproducibility.
 
-Despite the solid performance, the achieved mIoU is lower than state-of-the-art results on Cityscapes, mainly due to limited training epochs, the use of a ResNet-50 backbone, and the absence of large-scale pretraining beyond ImageNet. Future work could therefore focus on longer training schedules, stronger backbones (or larger DeepLab variants), and enhanced pretraining or semi-supervised strategies.
+Despite the solid performance, the achieved mIoU is lower than state-of-the-art results on Cityscapes, mainly due to limited training epochs, the use of a ResNet-50 backbone (pretrained on ImageNet only), and the absence of additional large-scale pretraining beyond ImageNet. Future work could therefore focus on longer training schedules, stronger backbones (e.g., ResNet-101 or transformer-based models), and enhanced pretraining or semi-supervised strategies.
 
 \section{Open Source Availability}
 \label{sec:open_source}
 The project repository is available at: \url{https://github.com/fra2404/segmentation-cityscape}
 
 \section*{Acknowledgment}
-This project was developed as part of the Artificial Intelligence course requirements at Beihang University (BUAA).
+This project was developed as the final project for the Artificial Intelligence course at Beihang University (BUAA).
 
 \begin{thebibliography}{99}
 
@@ -313,7 +315,7 @@ A. Buslaev et al., ``Albumentations: Fast and Flexible Image Augmentations,'' \e
 \label{sec:appendix_curves}
 This section presents the main training curves that summarize the quantitative evolution of the model during training. The following figures show the progression of training and validation loss, as well as the mean Intersection over Union (mIoU) metric on the validation set, across all epochs. These plots provide insight into the model's learning dynamics, convergence behavior, and generalization performance. 
 
-To obtain these results, all training checkpoints were systematically analyzed using the provided \texttt{analyze\_checkpoints.ipynb} notebook. This process generated the \texttt{checkpoint\_results.yaml} file, which records the metrics for each checkpoint and enables detailed tracking of the model's progress throughout training. The curves below are based on this comprehensive analysis, as discussed in Section~\ref{sec:results}.
+To obtain these results, all training checkpoints were systematically analyzed using the provided \texttt{analyze\_checkpoints.ipynb} notebook. This process generated the \texttt{checkpoint\_results.yaml} file, which records the metrics for each checkpoint and enables detailed tracking of the model's progress throughout training. The two plots below separately show the evolution of loss (training and validation) and validation mIoU, based on this comprehensive analysis as discussed in Section~\ref{sec:results}.
 
 \begin{figure}[ht]
 \centering
@@ -341,13 +343,13 @@ To obtain these results, all training checkpoints were systematically analyzed u
 \section{Figures: Qualitative Overlay Examples}
 \label{sec:appendix_overlays}
 
-For compactness and diversity, the following overlays include images from different Cityscapes cities (e.g., Frankfurt, Münster) to show the model's behavior on various urban scenes. To further test generalization, an additional overlay is shown for an external image (downloaded from the internet, not present in the training set). This allows qualitative assessment both on in-distribution and out-of-distribution data.
+For compactness and diversity, the following overlays include images from different Cityscapes cities (e.g., Frankfurt, Münster) to show the model's behavior on various urban scenes. To further test generalization, two additional overlays are shown for external images (downloaded from the internet, not present in the training set). This allows qualitative assessment both on in-distribution and out-of-distribution data.
 
 The overlays below correspond to:
 \begin{itemize}
   \item Three validation images from Frankfurt (Cityscapes val split)
   \item One validation image from Münster (Cityscapes val split)
-  \item One external photo (test.webp) downloaded from the web
+  \item Two external photos (test.webp and pexels-joshsorenson-139303.jpg) downloaded from the web
 \end{itemize}
 
 
@@ -405,8 +407,21 @@ The overlays below correspond to:
 }{%
   \fbox{\parbox{0.9\textwidth}{\centering Placeholder: overlay\_example\_test.png (export an overlay with inference/visualization utilities).}}%
 }
+
 \caption{Overlay example 5: external image (test.webp) downloaded from the web.}
 \label{fig:overlay_test}
+\end{figure}
+
+% Second external image overlay
+\begin{figure}[ht]
+\centering
+\IfFileExists{images/overlay_example_test2.png}{%
+  \includegraphics[width=0.9\textwidth]{images/overlay_example_test2.png}%
+}{%
+  \fbox{\parbox{0.9\textwidth}{\centering Placeholder: overlay\_example\_test2.png (export an overlay with inference/visualization utilities).}}%
+}
+\caption{Overlay example 6: external image (pexels-joshsorenson-139303.jpg) downloaded from the web.}
+\label{fig:overlay_test2}
 \end{figure}
 
 \end{document}

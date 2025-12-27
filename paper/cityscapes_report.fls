@@ -209,6 +209,11 @@ INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/courier/pcrr7t.
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrr7t.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrb7t.tfm
+INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/times/ptmro7t.tfm
+INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/courier/pcrr7t.vf
+INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm
+INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/courier/pcrb7t.vf
+INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmr8.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmr6.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm
@@ -217,11 +222,6 @@ INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
-INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/times/ptmro7t.tfm
-INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/courier/pcrr7t.vf
-INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrr8r.tfm
-INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/courier/pcrb7t.vf
-INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/times/ptmr7t.vf
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/vf/adobe/times/ptmri7t.vf
 INPUT /Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/times/ptmri8r.tfm
@@ -253,6 +253,10 @@ INPUT ./images/overlay_example_test.png
 INPUT ./images/overlay_example_test.png
 INPUT ./images/overlay_example_test.png
 INPUT ./images/overlay_example_test.png
+INPUT ./images/overlay_example_test2.png
+INPUT ./images/overlay_example_test2.png
+INPUT ./images/overlay_example_test2.png
+INPUT ./images/overlay_example_test2.png
 INPUT cityscapes_report.aux
 INPUT ./cityscapes_report.out
 INPUT ./cityscapes_report.out
