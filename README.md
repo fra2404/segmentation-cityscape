@@ -1,137 +1,109 @@
-# Semantic Segmentation Project
+# Cityscapes Semantic Segmentation
 
-This project implements semantic segmentation on Cityscapes with PyTorch. You can now train and run inference from Python scripts (no notebook required), with configurable input resolution (recommended 512x1024 or full 1024x2048).
+Semantic segmentation on the Cityscapes dataset using PyTorch with DeepLabV3/DeepLabV3+. The pipeline covers training, evaluation, visualization, and generation of submission-ready predictions.
 
-## Task Description
+## Task at a Glance
 
-- **Input**: RGB images from the Cityscapes dataset (high-resolution urban street scenes).
-- **Output**: Pixel-wise segmentation masks with 19 classes (e.g., road, car, pedestrian, etc.).
-- **Dataset**: Cityscapes (2,975 training images, 500 validation images).
-- **Model**: DeepLabV3 with ResNet101 backbone.
-- **Metrics**: Pixel Accuracy and Mean Intersection over Union (IoU).
+- **Input**: RGB street-scene images (Cityscapes, 1024x2048).
+- **Output**: Pixel-wise masks with 19 trainId classes; inference can also export official labelIds for server submission.
+- **Metrics**: Pixel Accuracy and Mean IoU (class-wise IoU reported).
+- **Model**: DeepLabV3+ (ResNet50 backbone, ImageNet pretrained by default) or DeepLabV3.
 
-## Project Structure
+## Repository Layout
 
-- `src/cityscapes_seg/`: Python package
-  - `datasets.py`: Cityscapes loaders (train/val/test)
-  - `transforms.py`: Mappings + transforms (Resize optional; NEAREST for masks)
-  - `model.py`: Model factory (`deeplabv3` or `deeplabv3plus`)
-  - `metrics.py`: Pixel accuracy, confusion matrix, mIoU
-  - `train.py`: CLI training script
-  - `predict_test.py`: CLI test inference saving labelId PNGs
-- `requirements.txt`: Python dependencies
-- `README.md`: This file
+- train.py — training/visualization CLI
+- evaluate.py — validation metrics + optional visualization
+- inference.py — single-image inference and overlay
+- generate_cityscapes_predictions.py — batch inference to labelIds PNGs (submission format)
+- src/
+  - data/dataset.py, data/transforms.py — dataloaders, augmentations, label mappings
+  - models/deeplabv3.py — model factory and checkpoints
+  - training/trainer.py, training/losses.py — training loop and losses
+  - evaluation/metrics.py — pixel accuracy, mIoU
+  - utils/config.py, utils/visualization.py — config and plotting helpers
+- requirements.txt — dependencies
 
-## Step-by-Step Setup and Execution
+## Environment
 
-### 1. Environment Setup
-
-- Create and activate a conda environment:
-  ```
-  conda create -n ai python=3.12 -y
-  conda activate ai
-  ```
-- Install dependencies:
-  ```
-  pip install -r requirements.txt
-  ```
-  Alternatively, if using conda:
-  ```
-  conda install pytorch torchvision numpy matplotlib opencv -c pytorch -c conda-forge -y
-  ```
-
-### 2. Download the Dataset
-
-- **Sito ufficiale**: https://www.cityscapes-dataset.com/
-- **Registrazione**: Crea un account gratuito (richiede nome, email, affiliazione).
-- **Login**: Accedi con le tue credenziali.
-- **Scarica i file**:
-  - Vai su "Download" → "leftImg8bit" → "leftImg8bit_trainvaltest.zip" (11GB)
-  - Vai su "Download" → "gtFine" → "gtFine_trainvaltest.zip" (241MB)
-- **Estrazione**:
-  ```
-  mkdir -p data/cityscapes
-  unzip leftImg8bit_trainvaltest.zip -d ./data/cityscapes/
-  unzip gtFine_trainvaltest.zip -d ./data/cityscapes/
-  ```
-- **Struttura finale**:
-  ```
-  data/cityscapes/
-  ├── leftImg8bit/     # Immagini RGB
-  │   ├── train/
-  │   ├── val/
-  │   └── test/
-  └── gtFine/          # Annotazioni ground truth
-      ├── train/
-      ├── val/
-      └── test/
-  ```
-
-### 3. Run Training (scripts)
-
-Set module path in your shell session:
-
-```zsh
-export PYTHONPATH="$PWD/src:$PYTHONPATH"
+```
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-Quick smoke test at 512x1024 on MPS (macOS):
+## Dataset (Cityscapes)
 
-```zsh
-python -m cityscapes_seg.train \
-  --root data/cityscapes \
-  --epochs 3 \
-  --batch-size 2 \
-  --workers 4 \
-  --drop-last \
-  --image-size 512 1024
+Download from https://www.cityscapes-dataset.com/ and extract to `data/cityscapes/`:
+
+```
+data/cityscapes/
+├── leftImg8bit/{train,val,test}
+└── gtFine/{train,val,test}
 ```
 
-Notes:
+## How to Run
 
-- Use `--image-size -1 -1` to keep original 1024x2048. Reduce `--batch-size` to 1 if you hit memory limits.
-- For DeepLabV3+ install first: `pip install segmentation-models-pytorch timm`, then add `--model deeplabv3plus --pretrained`.
+1. Training (512x1024 default, weighted sampler on):
 
-### 4. Run Test Inference (labelId PNGs)
-
-Uses the best checkpoint saved during training (default `logs/best_model.pth`):
-
-```zsh
-python -m cityscapes_seg.predict_test \
-  --root data/cityscapes \
-  --weights logs/best_model.pth \
-  --outdir predictions_test \
-  --batch-size 2 \
-  --workers 4 \
-  --image-size 512 1024
+```
+python train.py \
+	--data-root ./data/cityscapes \
+	--num-epochs 3 \
+	--batch-size 2 \
+	--image-size 512 1024 \
+	--device mps
 ```
 
-Outputs are valid Cityscapes `*_gtFine_labelIds.png` for server submission.
+2. Evaluation of a checkpoint + optional visuals:
 
-### 5. About Pre-trained Weights
+```
+python evaluate.py \
+	--checkpoint ./checkpoints/best_model.pth \
+	--visualize --num-samples 3
+```
 
-- The model uses `deeplabv3_resnet101(pretrained=True)`, which automatically downloads pre-trained weights from the torchvision model zoo (trained on COCO dataset).
-- This provides a strong starting point, improving performance without training from scratch.
-- Download size: ~200MB, cached locally after first run.
-- If offline, set `pretrained=False` to train from random weights (slower convergence).
-- For reproducibility, the weights are deterministic, but training results may vary slightly due to randomness.
+3. Single-image inference with overlay:
 
-### 6. Analysis and Results
+```
+python inference.py \
+	--image path/to/image.png \
+	--checkpoint ./checkpoints/best_model.pth \
+	--output overlay.png \
+	--image-size 512 1024
+```
 
-- **Data Analysis**: Cityscapes focuses on urban scenes; images are diverse but may have class imbalance (e.g., more road pixels).
-- **Algorithm Effectiveness**: DeepLabV3 uses atrous convolutions and ASPP for multi-scale features, achieving high IoU on urban segmentation.
-- **Visualization**: Compare predictions with ground truth to assess errors (e.g., misclassifying small objects).
-- **Improvements**: Increase epochs, use data augmentation, fine-tune hyperparameters, or try other backbones like MobileNetV3.
+4. Submission-style predictions (labelIds PNGs):
 
-## Requirements
+```
+python generate_cityscapes_predictions.py \
+	--checkpoint ./checkpoints/best_model.pth \
+	--data-root ./data/cityscapes \
+	--split val \
+	--output-dir ./cityscapes_results
+```
 
-- Python 3.8+
-- PyTorch 2.2+
-- Torchvision 0.17+
-- NumPy, Matplotlib, OpenCV
+## Data and Model Notes
 
-## Notes
+- Cityscapes is highly imbalanced (road/building dominate; rider/pole rare). A weighted sampler and class-weighted loss are enabled by default to upweight rare classes.
+- Images are resized to 512x1024 during training/eval for a good trade-off between accuracy and memory. Outputs are upsampled back to input size for visualization.
+- Ignore index 255 is handled consistently in loss and metrics.
+- Pretrained ImageNet weights provide faster convergence; set `--no-pretrained` to disable.
 
-- Training on CPU is slow; prefer MPS (macOS) or CUDA.
-- For better accuracy, train at 512x1024 or full 1024x2048. Avoid 256x256 as it harms Pixel Accuracy and mIoU.
-- Increase epochs (e.g., 50+) for stronger results; tune batch size to fit memory.
+## Experiments and Expected Metrics
+
+- Quick smoke (3 epochs, 512x1024, bs=2, MPS/CPU): sanity check of the pipeline; expect PixelAcc ≈ 0.45–0.55, mIoU ≈ 0.07–0.15.
+- Longer run (≈50 epochs, CUDA, bs=4–8): substantially better mIoU; tune LR, scheduler (`poly`/`cosine`), and augmentations for best results.
+- Visual outputs (`predictions.png`, `evaluation_predictions.png`) help inspect systematic errors (small objects, thin structures, boundaries).
+
+## Assignment Coverage
+
+- Clear **input/output** contract: RGB image → 19-class trainId mask (+ labelId export for submission).
+- **Data handling**: official Cityscapes splits with correct labelId→trainId mapping and ignore handling.
+- **Analysis hooks**: PixelAcc/mIoU reporting and class-wise IoU; weighted sampling to mitigate imbalance.
+- **Visualization**: overlays and side-by-side plots for qualitative assessment; batch export for server submission.
+
+## Tips
+
+- If memory is tight, lower `--batch-size` or increase `--grad-accum-steps`.
+- Use `--filter-city frankfurt` to validate on a single city when iterating quickly.
+- Training on CPU is slow; prefer MPS (Apple Silicon) or CUDA.

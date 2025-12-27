@@ -1,0 +1,17 @@
+{
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.view.pdf.autoReload": true,
+  "latex-workshop.latex.autoBuild.run": "onSave",
+
+  // Editor readability: wrap long lines and show a guideline at 80 cols
+  "editor.wordWrap": "on",
+  "editor.wordWrapColumn": 80,
+  "editor.rulers": [80]
+
+  // Formatting: enable format on save if latexindent is available
+  //  "editor.formatOnSave": true,
+  //  "latex-workshop.formatting.latexindent.path": "/Users/francesco/bin/latexindent",
+  //  "latex-workshop.formatting.latexindent.args": [],
+  // Use latexindent as the LaTeX formatter for LaTeX Workshop
+  //  "latex-workshop.formatting.latex": "latexindent"
+}
