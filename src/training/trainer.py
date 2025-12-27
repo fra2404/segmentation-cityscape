@@ -21,7 +21,6 @@ from contextlib import nullcontext
 from typing import Optional, Dict, Any, Tuple
 
 from ..evaluation.metrics import evaluate_model
-from ..models.deeplabv3 import save_checkpoint
 from ..data.dataset import compute_dataset_stats
 from .losses import CombinedLoss
 
