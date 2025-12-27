@@ -107,23 +107,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-os.makedirs('results_val', exist_ok=True)
-model.eval()
-with torch.no_grad():
-    for batch_idx, batch in enumerate(dataloader):
-        images = batch['image'].to(device)
-        filenames = batch['filename'] if 'filename' in batch else [f"img_{batch_idx}_{i}.png" for i in range(images.size(0))]
-        outputs = model(images)
-        preds = torch.argmax(outputs, dim=1)
-        images = images.cpu()
-        preds = preds.cpu()
-        for i in range(images.size(0)):
-            img = denormalize_image(images[i])
-            pred_mask = preds[i].numpy().astype(np.int32)
-            color_mask = colorize_mask(pred_mask)
-            overlay = overlay_mask_on_image(img, color_mask, alpha=0.5)
-            fname = os.path.splitext(filenames[i])[0]
-            out_path = f'results_val/{fname}_overlay.png'
-            plt.imsave(out_path, overlay)
-            print(f"✅ Saved: {out_path}")
