@@ -2,6 +2,14 @@
 
 import argparse
 import os
+import sys
+from pathlib import Path
+
+# Ensure the project root is on PYTHONPATH so `import src` works
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import torch
 from PIL import Image
 import matplotlib.pyplot as plt

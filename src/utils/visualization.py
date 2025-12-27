@@ -81,10 +81,10 @@ def visualize_predictions(
     batch = next(iter(dataloader))
     if isinstance(batch, dict):
         images = batch['image']
-        # Se per errore è una lista di tensori, stacka
+        # If it is (unexpectedly) a list of tensors, stack them
         if isinstance(images, list):
             images = torch.stack(images)
-        # Se per errore è una lista di numpy, convertila
+        # If it is (unexpectedly) a list of NumPy arrays, convert it
         if isinstance(images, np.ndarray) and images.dtype.type is np.str_:
             raise ValueError("batch['image'] contiene stringhe, non tensori!")
         images = images.to(device)

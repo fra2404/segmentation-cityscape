@@ -3,10 +3,12 @@
 
 import argparse
 import sys
-import os
+from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Ensure the project root is on PYTHONPATH so `import src` works
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.utils.config import Config
 from src.data.dataset import create_dataloaders

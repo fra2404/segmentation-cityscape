@@ -7,12 +7,18 @@ in the format required by the Cityscapes evaluation server.
 
 import os
 import argparse
+import sys
 from pathlib import Path
 import numpy as np
 from PIL import Image
 import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
+
+# Ensure the project root is on PYTHONPATH so `import src` works
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models.deeplabv3 import create_model, load_checkpoint
 from src.data.dataset import CityscapesDataset

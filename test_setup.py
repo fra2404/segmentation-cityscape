@@ -1,10 +1,11 @@
 """Test script to verify the installation and basic functionality."""
 
 import sys
-import os
+from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Add project root to PYTHONPATH so `import src` works
+PROJECT_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 import torch
 import torchvision

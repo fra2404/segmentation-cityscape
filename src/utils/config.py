@@ -23,11 +23,11 @@ class Config:
     max_train_batches: Optional[int] = None  # Limit training batches for quick testing
     
     # Weighted sampling
-    use_weighted_sampler: bool = False  # Disabled to mirror notebook training
+    use_weighted_sampler: bool = False  
     max_samples_for_stats: Optional[int] = None  # None = use all samples
     
     # Loss and scheduler settings
-    use_class_weights: bool = False  # Notebook uses unweighted CE loss
+    use_class_weights: bool = False  
     scheduler: str = 'poly'  # 'poly' or 'cosine'
     min_lr: float = 1e-6  # Minimum LR for cosine scheduler
     

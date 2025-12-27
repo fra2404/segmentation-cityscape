@@ -1,7 +1,7 @@
-from .transforms import to_train_id
 """Cityscapes dataset loading and dataloaders creation."""
 
 import os
+
 import numpy as np
 from PIL import Image
 import torch
@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader, WeightedRandomSampler, Dataset
 from torchvision import datasets
 from tqdm import tqdm
 
+from .transforms import to_train_id
 from .transforms import (
     get_train_transforms,
     get_val_transforms,
@@ -80,7 +81,7 @@ class CityscapesDataset(Dataset):
 
 class CityscapesRawDataset(Dataset):
     """
-    Custom loader that mirrors the notebook approach: reads raw files from
+    Custom loader: reads raw files from
     leftImg8bit/ and gtFine/ folders and applies Albumentations transforms
     that handle image+mask jointly.
     """
@@ -109,7 +110,7 @@ class CityscapesRawDataset(Dataset):
 
         image_path = os.path.join(self.image_dir, city, image_name)
 
-        # Cerca prima labelTrainIds, poi labelIds se non esiste
+        # First look for labelTrainIds, then for labelIds if labelTrainIds does not exist
         mask_name_trainids = image_name.replace('_leftImg8bit.png', '_gtFine_labelTrainIds.png')
         mask_name_labelids = image_name.replace('_leftImg8bit.png', '_gtFine_labelIds.png')
         mask_path_trainids = os.path.join(self.mask_dir, city, mask_name_trainids)
@@ -126,7 +127,7 @@ class CityscapesRawDataset(Dataset):
         image = np.array(Image.open(image_path).convert('RGB'))
         mask = np.array(Image.open(mask_path), dtype=np.uint8)
 
-        # Se la maschera è labelIds, converti in trainId
+        # If the mask is labelIds, convert to trainId
         if 'labelIds' in mask_path:
             mask = to_train_id(torch.from_numpy(mask).unsqueeze(0)).numpy()
 
@@ -249,7 +250,7 @@ def create_dataloaders(
     print(f"Loading Cityscapes dataset from {root}...")
 
     if use_albumentations:
-        # Notebook-like: Albumentations on raw files (trainId masks already encoded)
+        # Albumentations on raw files (trainId masks already encoded)
         train_transform = get_train_transforms_albu(image_size)
         val_transform = get_val_transforms_albu(image_size)
 
@@ -293,7 +294,7 @@ def create_dataloaders(
     print(f"Training samples: {len(train_dataset)}")
     print(f"Validation samples: {len(val_dataset)}")
     
-    # Create weighted sampler for training if requested (disabled when using Albumentations to mirror notebook)
+    # Create weighted sampler for training if requested 
     sampler = None
     shuffle = True
     dataset_stats = None

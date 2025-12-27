@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1766831380.42875 "/Users/francesco/Locale/Sviluppo/artificial_intelligence_final_project/paper/cityscapes_report.tex" "cityscapes_report.pdf" "cityscapes_report" 1766831382.61497 0
+["pdflatex"] 1766836795.14207 "/Users/francesco/Locale/Sviluppo/artificial_intelligence_final_project/paper/cityscapes_report.tex" "cityscapes_report.pdf" "cityscapes_report" 1766836797.31076 0
   "/Users/francesco/Library/TinyTeX/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrb7t.tfm" 1136768653 960 4ab65358b8406f30ef5496c8c096d22b ""
   "/Users/francesco/Library/TinyTeX/texmf-dist/fonts/tfm/adobe/courier/pcrb8r.tfm" 1136768653 1292 3059476c50a24578715759f22652f3d0 ""
@@ -103,11 +103,11 @@
   "/Users/francesco/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1766126117 165370 80ba44ee5382174ffeebb3aad9eb32bf ""
   "/Users/francesco/Library/TinyTeX/texmf-var/web2c/pdftex/pdflatex.fmt" 1762313225 2266251 a72f54dd6c52ca689f2683d6dc8c17db ""
   "/Users/francesco/Library/TinyTeX/texmf.cnf" 1730906724.86071 708 85fd07691b6294ba94c59dbc62380410 ""
-  "/Users/francesco/Locale/Sviluppo/artificial_intelligence_final_project/paper/cityscapes_report.tex" 1766831380.2393 22300 3ef345d9d801522824c17a50356b14d4 ""
+  "/Users/francesco/Locale/Sviluppo/artificial_intelligence_final_project/paper/cityscapes_report.tex" 1766836792.66291 22459 60de3a53d8334a987fcaa0c281e33554 ""
   "IEEEtran.cls" 1766200515.0329 281957 5b2e4fa15b0f7eabb840ebf67df4c0f7 ""
-  "cityscapes_report.aux" 1766831382.53745 7053 b506acea6b7bc5f8d8f8a972bbd576f2 "pdflatex"
-  "cityscapes_report.out" 1766831382.53874 4674 7ab653fbe1294ee038130deab3531e7d "pdflatex"
-  "cityscapes_report.tex" 1766831380.2393 22300 3ef345d9d801522824c17a50356b14d4 ""
+  "cityscapes_report.aux" 1766836797.22766 7071 2fc16389b505daf88cd7758f5f474e26 "pdflatex"
+  "cityscapes_report.out" 1766836797.22887 4674 7ab653fbe1294ee038130deab3531e7d "pdflatex"
+  "cityscapes_report.tex" 1766836792.66291 22459 60de3a53d8334a987fcaa0c281e33554 ""
   "images/overlay_example_1.png" 1766204731.94071 1038802 2832e32704e11930ed8c3f8aa029db4d ""
   "images/overlay_example_2.png" 1766204731.97872 1102258 d9840725992960adea74ceaa09d16340 ""
   "images/overlay_example_3.png" 1766204731.98217 1167128 13952050d7545578d04afd2d41eee715 ""

@@ -3,7 +3,7 @@
 import torch
 from torchvision import transforms
 
-# Albumentations is used to mirror the notebook augmentation pipeline
+# Albumentations
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import cv2
@@ -155,11 +155,11 @@ def get_target_transform(image_size=(256, 256), use_all_classes=False):
 
 
 # ----------------------------
-# Albumentations (notebook-like)
+# Albumentations
 # ----------------------------
 
 def get_train_transforms_albu(image_size=(512, 512)):
-    """Albumentations training transforms (replica of the notebook pipeline)."""
+    """Albumentations training transforms."""
     height, width = image_size
     # Use integer values for interpolation to avoid Pylint error
     INTER_LINEAR = 1

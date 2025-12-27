@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.5)  27 DEC 2025 11:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.11.5)  27 DEC 2025 12:59
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -567,56 +567,56 @@ Underfull \hbox (badness 5374) in paragraph at lines 208--209
 [3] [4
 
 ]
-** WARNING: Ignoring useless \section in Appendix (line 314).
+** WARNING: Ignoring useless \section in Appendix (line 317).
 
-Underfull \hbox (badness 10000) in paragraph at lines 318--319
+Underfull \hbox (badness 10000) in paragraph at lines 321--322
 []\OT1/ptm/m/n/10 To ob-tain these re-sults, all train-ing check-points were sys-tem-at-i-cally an-a-lyzed us-ing the pro-vided
  []
 
-<loss_curves.png, id=205, 505.89pt x 289.08pt>
+<loss_curves.png, id=206, 505.89pt x 289.08pt>
 File: loss_curves.png Graphic file (type png)
 <use loss_curves.png>
-Package pdftex.def Info: loss_curves.png  used on input line 326.
+Package pdftex.def Info: loss_curves.png  used on input line 329.
 (pdftex.def)             Requested size: 412.80157pt x 235.89143pt.
-<miou_curve.png, id=207, 505.89pt x 289.08pt>
+<miou_curve.png, id=208, 505.89pt x 289.08pt>
 File: miou_curve.png Graphic file (type png)
 <use miou_curve.png>
-Package pdftex.def Info: miou_curve.png  used on input line 337.
+Package pdftex.def Info: miou_curve.png  used on input line 340.
 (pdftex.def)             Requested size: 412.80157pt x 235.89143pt.
 [5
 
 
  <./loss_curves.png> <./miou_curve.png>]
-** WARNING: Ignoring useless \section in Appendix (line 343).
-<images/overlay_example_1.png, id=215, 1293.633pt x 238.9728pt>
+** WARNING: Ignoring useless \section in Appendix (line 346).
+<images/overlay_example_1.png, id=216, 1293.633pt x 238.9728pt>
 File: images/overlay_example_1.png Graphic file (type png)
 <use images/overlay_example_1.png>
-Package pdftex.def Info: images/overlay_example_1.png  used on input line 363.
+Package pdftex.def Info: images/overlay_example_1.png  used on input line 366.
 (pdftex.def)             Requested size: 464.39685pt x 85.78581pt.
-<images/overlay_example_2.png, id=216, 1293.633pt x 238.9728pt>
+<images/overlay_example_2.png, id=217, 1293.633pt x 238.9728pt>
 File: images/overlay_example_2.png Graphic file (type png)
 <use images/overlay_example_2.png>
-Package pdftex.def Info: images/overlay_example_2.png  used on input line 374.
+Package pdftex.def Info: images/overlay_example_2.png  used on input line 377.
 (pdftex.def)             Requested size: 464.39685pt x 85.78581pt.
-<images/overlay_example_3.png, id=217, 1293.633pt x 238.9728pt>
+<images/overlay_example_3.png, id=218, 1293.633pt x 238.9728pt>
 File: images/overlay_example_3.png Graphic file (type png)
 <use images/overlay_example_3.png>
-Package pdftex.def Info: images/overlay_example_3.png  used on input line 385.
+Package pdftex.def Info: images/overlay_example_3.png  used on input line 388.
 (pdftex.def)             Requested size: 464.39685pt x 85.78581pt.
-<images/overlay_example_munster.png, id=218, 1293.633pt x 238.9728pt>
+<images/overlay_example_munster.png, id=219, 1293.633pt x 238.9728pt>
 File: images/overlay_example_munster.png Graphic file (type png)
 <use images/overlay_example_munster.png>
-Package pdftex.def Info: images/overlay_example_munster.png  used on input line 397.
+Package pdftex.def Info: images/overlay_example_munster.png  used on input line 400.
 (pdftex.def)             Requested size: 464.39685pt x 85.78581pt.
-<images/overlay_example_test.png, id=219, 1293.633pt x 308.8338pt>
+<images/overlay_example_test.png, id=220, 1293.633pt x 308.8338pt>
 File: images/overlay_example_test.png Graphic file (type png)
 <use images/overlay_example_test.png>
-Package pdftex.def Info: images/overlay_example_test.png  used on input line 409.
+Package pdftex.def Info: images/overlay_example_test.png  used on input line 412.
 (pdftex.def)             Requested size: 464.39685pt x 110.86435pt.
-<images/overlay_example_test2.png, id=220, 1293.633pt x 308.8338pt>
+<images/overlay_example_test2.png, id=221, 1293.633pt x 308.8338pt>
 File: images/overlay_example_test2.png Graphic file (type png)
 <use images/overlay_example_test2.png>
-Package pdftex.def Info: images/overlay_example_test2.png  used on input line 422.
+Package pdftex.def Info: images/overlay_example_test2.png  used on input line 425.
 (pdftex.def)             Requested size: 464.39685pt x 110.86435pt.
 
 ** Conference Paper **
@@ -640,18 +640,18 @@ Package rerunfilecheck Info: File `cityscapes_report.out' has not changed.
 (rerunfilecheck)             Checksum: 7AB653FBE1294EE038130DEAB3531E7D;4674.
  ) 
 Here is how much of TeX's memory you used:
- 16868 strings out of 469435
- 315303 string characters out of 5466465
+ 16870 strings out of 469435
+ 315318 string characters out of 5466465
  1074856 words of memory out of 5000000
- 45277 multiletter control sequences out of 15000+600000
+ 45278 multiletter control sequences out of 15000+600000
  663025 words of font info for 106 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  75i,11n,79p,890b,1261s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></Users/francesco/Library/TinyTeX/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on cityscapes_report.pdf (7 pages, 10003870 bytes).
+Output written on cityscapes_report.pdf (7 pages, 10003995 bytes).
 PDF statistics:
- 323 PDF objects out of 1000 (max. 8388607)
- 269 compressed objects within 3 object streams
- 104 named destinations out of 1000 (max. 500000)
+ 324 PDF objects out of 1000 (max. 8388607)
+ 270 compressed objects within 3 object streams
+ 105 named destinations out of 1000 (max. 500000)
  241 words of extra memory for PDF output out of 10000 (max. 10000000)
 
